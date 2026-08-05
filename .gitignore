@@ -1,0 +1,18 @@
+# Copyright (c) 2026 Apryse Group NV
+# SPDX-License-Identifier: MIT
+# See LICENSE in the repository root.
+
+# Local self-test scratch dirs
+test-input/
+test-output/
+test-output-single/
+
+# Maven
+app/target/
+
+# Python notice tooling
+__pycache__/
+
+# IDE
+.idea/
+*.iml

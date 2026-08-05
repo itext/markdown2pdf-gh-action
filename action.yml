@@ -1,0 +1,53 @@
+# Copyright (c) 2026 Apryse Group NV
+# SPDX-License-Identifier: MIT
+# See LICENSE in the repository root.
+
+name: 'markdown2pdf'
+description: 'Converts a Markdown file to PDF or a folder to a ZIP of PDFs. Linux x86_64, public repositories only.'
+author: 'iText'
+
+branding:
+  icon: 'file-text'
+  color: 'blue'
+
+inputs:
+  input:
+    description: 'Path to a markdown file or folder to convert'
+    required: true
+  output:
+    description: 'Destination .pdf file for a Markdown file, or .zip file for a folder'
+    required: true
+  repository-name:
+    description: 'Name of the repository the markdown belongs to (for example owner/repo)'
+    required: false
+    default: ${{ github.repository }}
+  branch-name:
+    description: 'Name of the branch the markdown belongs to'
+    required: false
+    default: ${{ github.ref_name }}
+
+outputs:
+  output-path:
+    description: 'Absolute path of the generated PDF or ZIP file'
+    value: ${{ steps.convert.outputs.output-path }}
+  output-type:
+    description: 'Type of the generated file: pdf or zip'
+    value: ${{ steps.convert.outputs.output-type }}
+  pdf-count:
+    description: 'Number of PDFs generated (one for file input)'
+    value: ${{ steps.convert.outputs.pdf-count }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run itext-markdown2pdf
+      id: convert
+      shell: bash
+      run: '"${GITHUB_ACTION_PATH}/scripts/run-convert.sh" "$INPUT_PATH" "$OUTPUT_PATH" "$REPOSITORY_NAME" "$BRANCH_NAME"'
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        GITHUB_TOKEN: ${{ github.token }}
+        INPUT_PATH: ${{ inputs.input }}
+        OUTPUT_PATH: ${{ inputs.output }}
+        REPOSITORY_NAME: ${{ inputs.repository-name }}
+        BRANCH_NAME: ${{ inputs.branch-name }}

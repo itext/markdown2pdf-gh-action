@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2026 Apryse Group NV
+  SPDX-License-Identifier: MIT
+  See LICENSE in the repository root.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.itextpdf</groupId>
+  <artifactId>markdown2pdf-gh-plugin-app</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <!-- Original wrapper sources only; bundled binary and dependencies have separate terms. -->
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <properties>
+    <!-- The markdown2pdf library lives in the itext-markdown-converter repository. -->
+    <markdown2pdf.version>1.0-SNAPSHOT</markdown2pdf.version>
+    <native.maven.plugin.version>1.1.7</native.maven.plugin.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Java 11 API and bytecode, also when the build itself runs on a newer (GraalVM) JDK. -->
+    <maven.compiler.release>11</maven.compiler.release>
+    <localTesting.skip>true</localTesting.skip>
+  </properties>
+
+  <dependencies>
+
+    <!--
+      itext-core is pulled in transitively, minus the modules the markdown conversion never uses.
+      Excluding them keeps ~17MB of dead code and CJK/hyphenation resources out of the native image.
+    -->
+    <dependency>
+      <groupId>com.itextpdf</groupId>
+      <artifactId>markdown2pdf</artifactId>
+      <version>${markdown2pdf.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.itextpdf</groupId>
+          <artifactId>sign</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.itextpdf</groupId>
+          <artifactId>barcodes</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.itextpdf</groupId>
+          <artifactId>font-asian</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.itextpdf</groupId>
+          <artifactId>hyph</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.14.2</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <!-- Unit tests can use the testing entry point without packaging it. -->
+          <execution>
+            <id>local-testing-test-sources</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/localTesting/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <id>binary-license-sidecars</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../bin</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>LICENSE.txt</include>
+                    <include>THIRD-PARTY-NOTICES.txt</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <directory>${project.basedir}/..</directory>
+                  <filtering>false</filtering>
+                  <includes>
+                    <include>NOTICE.txt</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>root-mit-license-sidecar</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <copy file="${project.basedir}/../LICENSE.txt"
+                      tofile="${project.build.directory}/MIT-LICENSE.txt"
+                      overwrite="true"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      mvn -Pnative clean package : builds only the shippable native executable into target/.
+      Add ,localTesting to also compile the testing sources and build the testing-only executable.
+      Run maven itself on the GraalVM JDK (sdk use java 25.0.4-graal), the plugin needs Java 17+.
+    -->
+    <profile>
+      <id>native</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <version>${native.maven.plugin.version}</version>
+            <configuration>
+              <fallback>false</fallback>
+              <!-- The community metadata for jackson/bouncycastle pins code we never use. -->
+              <metadataRepository>
+                <enabled>false</enabled>
+              </metadataRepository>
+              <buildArgs>
+                <buildArg>--enable-url-protocols=http,https</buildArg>
+                <!-- Optimize for size, this is a short lived batch CLI. -->
+                <buildArg>-Os</buildArg>
+                <!-- iText reads font tables with legacy charsets such as Cp1252. -->
+                <buildArg>-H:+AddAllCharsets</buildArg>
+                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+              </buildArgs>
+            </configuration>
+            <executions>
+              <!-- The shippable executable: only runs inside a GitHub open source workflow. -->
+              <execution>
+                <id>build-shippable-executable</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>compile-no-fork</goal>
+                </goals>
+                <configuration>
+                  <imageName>itext-markdown2pdf</imageName>
+                  <mainClass>com.itextpdf.Main</mainClass>
+                </configuration>
+              </execution>
+              <!-- NEVER SHIP THIS ONE: it skips every precondition check. -->
+              <execution>
+                <id>build-testing-only-executable</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>compile-no-fork</goal>
+                </goals>
+                <configuration>
+                  <skip>${localTesting.skip}</skip>
+                  <imageName>itext-markdown2pdf-TESTING-ONLY-DO-NOT-SHIP</imageName>
+                  <mainClass>com.itextpdf.TestingOnlyMain</mainClass>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>localTesting</id>
+      <properties>
+        <localTesting.skip>false</localTesting.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>local-testing-main-sources</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/localTesting/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+      mvn -Pnative,compress clean package : additionally compresses the built executables with UPX
+      (~50MB -> ~16MB, costs about 0.1s extra startup). Requires upx on the PATH.
+    -->
+    <profile>
+      <id>compress</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <id>compress-shippable-executable</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>upx</executable>
+                  <arguments>
+                    <argument>--best</argument>
+                    <argument>${project.build.directory}/itext-markdown2pdf</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>compress-testing-only-executable</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <skip>${localTesting.skip}</skip>
+                  <executable>upx</executable>
+                  <arguments>
+                    <argument>--best</argument>
+                    <argument>${project.build.directory}/itext-markdown2pdf-TESTING-ONLY-DO-NOT-SHIP</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

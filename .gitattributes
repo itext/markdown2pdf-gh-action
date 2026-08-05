@@ -1,0 +1,8 @@
+# Normalize line endings for scripts so they stay executable on Linux runners.
+*.sh text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+
+# The converter is a binary; never touch its contents.
+# Don't touch my spaghet
+bin/itext-markdown2pdf binary

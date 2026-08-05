@@ -1,0 +1,181 @@
+itext-markdown2pdf GitHub Action
+Copyright (c) 2026 Apryse Group NV
+
+LICENSE BOUNDARIES
+==================
+The GitHub Action's original source code, including action.yml, scripts,
+Java CLI wrapper sources in app/, tests, examples and documentation, is
+licensed under the MIT License in the repository root LICENSE file.
+
+The prebuilt itext-markdown2pdf executable is a separate, closed-source
+distribution. It is NOT licensed under the repository's MIT License. It is
+provided by Apryse Group NV under the iText Markdown-to-PDF Binary Limited
+Use License, whose full text is in bin/LICENSE.txt, next to the binary.
+That license permits use only through the Official iText GitHub Action,
+subject to its terms; the MIT license on the wrapper grants no additional
+rights in the binary or its proprietary iText components.
+
+For a standalone binary distribution (including Artifactory), LICENSE.txt
+and THIRD-PARTY-NOTICES.txt accompany the executable in the same directory;
+NOTICE.txt and MIT-LICENSE.txt (the wrapper's MIT license) accompany it too.
+The full upstream dependency notices are in bin/THIRD-PARTY-NOTICES.txt in
+the repository, or THIRD-PARTY-NOTICES.txt beside a separately packaged binary.
+Third-party materials retain their own licenses. This inventory does not
+relicense those materials or replace their license terms.
+
+DEPENDENCY INVENTORY
+====================
+This inventory describes the dependencies resolved from app/pom.xml on
+2026-09-29. It conservatively includes runtime dependencies even where
+native-image reachability analysis may remove unused code. SNAPSHOT versions
+are mutable: review and regenerate the accompanying upstream notices for
+every binary release. See docs/RELEASING.md. Test and build dependencies are
+listed separately; listing a build tool does not imply it is shipped.
+
+iText components incorporated in the binary
+------------------------------------------
+Provider: iText / Apryse; https://itextpdf.com/
+Binary distribution terms: bin/LICENSE.txt, as described above.
+* com.itextpdf:markdown2pdf:1.0-SNAPSHOT
+  https://github.com/itext/itext-markdown-converter
+* com.itextpdf:html2pdf:6.3.5-SNAPSHOT (pdfHTML)
+  https://github.com/itext/itext-pdfhtml-java
+* com.itextpdf:itext-core:9.9.0-SNAPSHOT (dependency aggregator POM)
+* com.itextpdf:commons:9.9.0-SNAPSHOT
+* com.itextpdf:io:9.9.0-SNAPSHOT
+* com.itextpdf:kernel:9.9.0-SNAPSHOT
+* com.itextpdf:layout:9.9.0-SNAPSHOT
+* com.itextpdf:forms:9.9.0-SNAPSHOT
+* com.itextpdf:svg:9.9.0-SNAPSHOT
+* com.itextpdf:pdfa:9.9.0-SNAPSHOT
+* com.itextpdf:pdfua:9.9.0-SNAPSHOT
+* com.itextpdf:styled-xml-parser:9.9.0-SNAPSHOT
+* com.itextpdf:bouncy-castle-connector:9.9.0-SNAPSHOT
+* com.itextpdf:bouncy-castle-adapter:9.9.0-SNAPSHOT
+  https://github.com/itext/itext-java
+The upstream iText libraries outside of this binary remain subject to their applicable AGPL or commercial
+licensing terms; this repository does not grant an MIT license to
+them. An authorized proprietary release must have the necessary iText rights.
+The sign, barcodes, font-asian and hyph modules are excluded by app/pom.xml.
+
+Other runtime libraries
+-----------------------
+* CommonMark Java: org.commonmark:commonmark:0.27.0,
+  org.commonmark:commonmark-ext-gfm-tables:0.27.0,
+  org.commonmark:commonmark-ext-gfm-strikethrough:0.27.0,
+  org.commonmark:commonmark-ext-task-list-items:0.27.0.
+  BSD-2-Clause; Copyright (c) 2015 Atlassian Pty Ltd.
+  https://github.com/commonmark/commonmark-java
+* SLF4J: org.slf4j:slf4j-api:2.0.17, org.slf4j:slf4j-simple:2.0.17.
+  MIT; Copyright (c) 2004-2022 QOS.ch Sarl (Switzerland).
+  https://www.slf4j.org/license.html
+* Bouncy Castle: org.bouncycastle:bcprov-jdk18on:1.86,
+  org.bouncycastle:bcpkix-jdk18on:1.86, org.bouncycastle:bcutil-jdk18on:1.86.
+  MIT; Copyright (c) 2000-2026 The Legion of the Bouncy Castle Inc.
+  https://www.bouncycastle.org/licence.html
+* Jackson: com.fasterxml.jackson.core:jackson-core:2.22.3,
+  com.fasterxml.jackson.core:jackson-databind:2.22.3,
+  com.fasterxml.jackson.core:jackson-annotations:2.22.
+  Apache-2.0; Copyright 2007-, Tatu Saloranta and contributors.
+  https://github.com/FasterXML/jackson
+
+Embedded third-party code and fonts (not separate Maven dependencies)
+-------------------------------------------------------------------
+The complete upstream notices, copyrights and license terms for these
+materials are preserved in THIRD-PARTY-NOTICES.txt, grouped by source JAR.
+Versions below are those identified by the incorporating library's notices;
+where no version is given, the incorporating artifact identifies the copy.
+
+* Noto Sans (Regular, Bold, Italic, BoldItalic), Noto Sans Mono,
+  Noto Sans Symbols, Noto Sans Symbols 2, Noto Emoji and Noto Color Emoji:
+  bundled in markdown2pdf's font/ resources. SIL Open Font License 1.1;
+  the accompanying OFL.txt states Copyright 2013 Google LLC.
+  https://github.com/notofonts / https://github.com/googlefonts/noto-emoji
+* Noto Sans, Noto Sans Mono and Noto Serif: bundled in pdfHTML's font
+  resources. SIL Open Font License 1.1; Copyright 2018 The Noto Project
+  Authors. pdfHTML's NOTICE identifies the upstream font revision.
+  https://github.com/googlefonts/noto-fonts
+* jsoup 1.14.1: modified copy in styled-xml-parser; MIT;
+  Copyright (c) 2009-2025 Jonathan Hedley. https://jsoup.org/
+* Chromium grid layout algorithm: code in layout's GridTrackSizer;
+  BSD-3-Clause; Copyright 2015 The Chromium Authors.
+  https://www.chromium.org/
+* Apache Software Foundation code: layout's hyphenation package, io's
+  BufferCleaner and IntHashtable, and kernel's Point; Apache-2.0.
+  https://www.apache.org/licenses/LICENSE-2.0
+* WOFF2, including portions of OpenType Sanitizer: embedded in io;
+  Apache-2.0; Copyright 2013 Google Inc. https://github.com/google/woff2
+* jai_imageio 1.0_01: embedded in io; upstream BSD terms;
+  Copyright 2003-2012 Paulo Soares and Copyright 2005 Sun Microsystems, Inc.
+* libtiff constants: embedded in io; libtiff license;
+  Copyright 2003-2012 Paulo Soares, Copyright 1988-1997 Sam Leffler and
+  Copyright 1991-1997 Silicon Graphics, Inc. https://libtiff.gitlab.io/libtiff/
+* Brotli decoder: embedded in io; MIT; Copyright 2015 Google Inc.
+  https://github.com/google/brotli
+* Adobe XMP Toolkit: embedded in kernel; upstream BSD terms;
+  Copyright (c) 2006 Adobe Systems Incorporated.
+  This product includes software developed by the Adobe Systems Incorporated.
+* Clipper: embedded in kernel; Boost Software License 1.0.
+  https://www.angusj.com/delphi/clipper.php
+* ReportLab Bezier code: embedded in kernel; ReportLab license.
+  https://www.reportlab.com/
+* Robert Harder's Base64 2.2.1: embedded in commons; public-domain
+  dedication as reproduced in its upstream notice. https://iharder.net/base64
+* FastDoubleParser and Schubfach: embedded in jackson-core; MIT;
+  Werner Randelshofer and Raffaello Giulietti respectively.
+  https://github.com/wrandelshofer/FastDoubleParser
+  https://github.com/c4f7fcce9cb06515/Schubfach
+* FastDoubleParser's incorporated fast_float code: Daniel Lemire (Boost
+  Software License 1.0), and the fast_float authors (MIT); incorporated
+  bigint portions: Tim Buktu (BSD-2-Clause). Full notices are included.
+  https://github.com/fastfloat/fast_float / https://github.com/tbuktu/bigint
+
+Test-only dependencies (not incorporated in the converter)
+---------------------------------------------------------
+* org.junit.jupiter:junit-jupiter:5.14.2,
+  org.junit.jupiter:junit-jupiter-api:5.14.2,
+  org.junit.jupiter:junit-jupiter-params:5.14.2,
+  org.junit.jupiter:junit-jupiter-engine:5.14.2,
+  org.junit.platform:junit-platform-commons:1.14.2,
+  org.junit.platform:junit-platform-engine:1.14.2.
+  Eclipse Public License 2.0; JUnit team and contributors.
+  https://junit.org/ / https://www.eclipse.org/legal/epl-2.0/
+* org.opentest4j:opentest4j:1.3.0: Apache-2.0.
+  https://github.com/ota4j-team/opentest4j
+* org.apiguardian:apiguardian-api:1.1.2: Apache-2.0.
+  https://github.com/apiguardian-team/apiguardian
+
+Build, CI and runner tools
+-------------------------
+* Apache Maven and its lifecycle/dependency plugins: Apache-2.0.
+  https://maven.apache.org/ / https://www.apache.org/licenses/LICENSE-2.0
+* org.graalvm.buildtools:native-maven-plugin:1.1.7: UPL-1.0.
+  https://github.com/graalvm/native-build-tools
+* org.codehaus.mojo:exec-maven-plugin:3.5.0 (optional compression): Apache-2.0.
+  https://www.mojohaus.org/exec-maven-plugin/
+* GraalVM Native Image / JDK: the documented build uses Oracle GraalVM
+  for JDK 25.0.4, under GraalVM Free Terms and Conditions (GFTC), with
+  separately licensed technology. Do not confuse this with GraalVM Community
+  Edition's GPL-2.0 with Classpath Exception distribution. Preserve the
+  actual build JDK's LICENSE, NOTICE and legal/ texts with each release;
+  the accompanying generated notices include these conservatively (not all
+  listed JDK modules or toolchain components are incorporated in the image).
+  https://www.graalvm.org/ / https://www.oracle.com/downloads/licenses/graal-free-license.html
+* UPX (optional): GPL-2.0-or-later with the special exception for compressed
+  executables. Compression does not impose the UPX GPL on the executable.
+  https://github.com/upx/upx/blob/devel/LICENSE
+* Runner-provided zlib (libz.so.1): zlib license, Jean-loup Gailly and Mark
+  Adler; https://zlib.net/zlib_license.html. Runner-provided glibc
+  (libc.so.6 and loader): LGPL-2.1-or-later; https://www.gnu.org/software/libc/.
+  These are dynamically linked system dependencies, not bundled copies.
+* Bash and GNU coreutils (wrapper/tests), Git and GNU tar (release tooling):
+  GNU GPL family licenses; supplied by the runner/build host, not bundled.
+  https://www.gnu.org/licenses/ / https://git-scm.com/about/free-and-open-source
+* Python 3 (notice generation/CI checks): PSF license; https://docs.python.org/3/license.html
+* PyYAML (CI YAML validation): MIT; https://github.com/yaml/pyyaml
+* ShellCheck (CI lint): GPL-3.0-or-later; https://github.com/koalaman/shellcheck
+* actions/checkout@v4 and actions/upload-artifact@v4 (CI and examples): MIT.
+  Their distributions retain their own bundled dependency notices; they are
+  not embedded in this composite action or the converter.
+  https://github.com/actions/checkout/blob/v4/LICENSE
+  https://github.com/actions/upload-artifact/blob/v4/LICENSE

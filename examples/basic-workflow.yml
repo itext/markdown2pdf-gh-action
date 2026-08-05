@@ -1,0 +1,36 @@
+# Copyright (c) 2026 Apryse Group NV
+# SPDX-License-Identifier: MIT
+# See LICENSE in the repository root.
+
+name: Convert docs to PDF
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Convert markdown to PDF
+        id: convert
+        uses: itext/itext-markdown2pdf@v1
+        with:
+          input: 'docs'
+          output: 'dist/documents.zip'
+          # For a single PDF: input: 'README.md', output: 'dist/README.pdf'
+          repository-name: ${{ github.repository }}
+          branch-name: ${{ github.ref_name }}
+
+      - name: Upload conversion result
+        uses: actions/upload-artifact@v4
+        with:
+          name: itext-markdown2pdf-output
+          path: ${{ steps.convert.outputs.output-path }}
+          if-no-files-found: error
+
