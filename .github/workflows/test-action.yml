@@ -6,6 +6,8 @@ name: Test itext-markdown2pdf action
 
 on:
   push:
+    branches:
+      - master
   pull_request:
   workflow_dispatch:
 
@@ -43,20 +45,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Prepare nested Markdown and PDF validation tools
+      - name: Prepare PDF validation tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip
-          mkdir -p 'test-input/nested folder'
-          cp test-fixtures/sample.md test-input/sample.md
-          cp test-fixtures/sample.md 'test-input/nested folder/second file.md'
-
-      - name: Convert a folder
-        id: folder
-        uses: ./
-        with:
-          input: 'test-input'
-          output: 'test-output/documents.zip'
+          sudo apt-get install -y -qq poppler-utils
 
       - name: Convert a single file
         id: single
@@ -67,36 +59,76 @@ jobs:
 
       - name: Validate files and action outputs
         env:
-          ZIP_PATH: ${{ steps.folder.outputs.output-path }}
-          ZIP_TYPE: ${{ steps.folder.outputs.output-type }}
-          ZIP_COUNT: ${{ steps.folder.outputs.pdf-count }}
           PDF_PATH: ${{ steps.single.outputs.output-path }}
           PDF_TYPE: ${{ steps.single.outputs.output-type }}
           PDF_COUNT: ${{ steps.single.outputs.pdf-count }}
         run: |
-          test "$ZIP_TYPE" = zip && test "$ZIP_COUNT" = 2
           test "$PDF_TYPE" = pdf && test "$PDF_COUNT" = 1
-          test "$ZIP_PATH" = "$GITHUB_WORKSPACE/test-output/documents.zip"
           test "$PDF_PATH" = "$GITHUB_WORKSPACE/test-output/sample.pdf"
           python3 - <<'PY'
           import os
-          import zipfile
-          with zipfile.ZipFile(os.environ['ZIP_PATH']) as archive:
-              assert archive.testzip() is None
-              assert set(archive.namelist()) == {'sample.pdf', 'nested folder/second file.pdf'}
-              assert all(archive.read(name).startswith(b'%PDF-') for name in archive.namelist())
+          from pathlib import Path
+          output = Path(os.environ['PDF_PATH'])
+          assert set(output.parent.rglob('*')) == {output}
+          assert output.read_bytes().startswith(b'%PDF-')
           PY
-          unzip -q "$ZIP_PATH" -d test-output-unpacked
-          for pdf in "$PDF_PATH" test-output-unpacked/sample.pdf 'test-output-unpacked/nested folder/second file.pdf'; do
-            pdfinfo "$pdf"
-            pdftotext "$pdf" - | grep 'Sample document'
-          done
+          pdfinfo "$PDF_PATH"
+          pdftotext "$PDF_PATH" - | grep 'Sample document'
 
       - name: Upload test output
         uses: actions/upload-artifact@v4
         with:
           name: self-test-output
           if-no-files-found: error
-          path: |
-            ${{ steps.folder.outputs.output-path }}
-            ${{ steps.single.outputs.output-path }}
+          path: ${{ steps.single.outputs.output-path }}
+
+  self-test-folder:
+    name: Run the action against a folder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare PDF validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils unzip zip
+
+      - name: Convert a folder
+        id: folder
+        uses: ./
+        with:
+          input: 'test-fixtures/multi-markdown'
+          output: 'test-output/documents.zip'
+
+      - name: Validate ZIP and action outputs
+        env:
+          ZIP_PATH: ${{ steps.folder.outputs.output-path }}
+          ZIP_TYPE: ${{ steps.folder.outputs.output-type }}
+          ZIP_COUNT: ${{ steps.folder.outputs.pdf-count }}
+        run: |
+          test "$ZIP_TYPE" = zip && test "$ZIP_COUNT" = 2
+          test "$ZIP_PATH" = "$GITHUB_WORKSPACE/test-output/documents.zip"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import zipfile
+          output = Path(os.environ['ZIP_PATH'])
+          assert set(output.parent.rglob('*')) == {output}
+          with zipfile.ZipFile(output) as archive:
+              assert archive.testzip() is None
+              assert set(archive.namelist()) == {'file-1.pdf', 'file-2.pdf'}
+              assert all(archive.read(name).startswith(b'%PDF-') for name in archive.namelist())
+          PY
+          unzip -q "$ZIP_PATH" -d test-output-unpacked
+          for number in 1 2; do
+            pdf="test-output-unpacked/file-$number.pdf"
+            pdfinfo "$pdf"
+            pdftotext "$pdf" - | grep "This is file $number"
+          done
+
+      - name: Upload folder test output
+        uses: actions/upload-artifact@v4
+        with:
+          name: self-test-folder-output
+          if-no-files-found: error
+          path: ${{ steps.folder.outputs.output-path }}

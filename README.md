@@ -137,8 +137,10 @@ TEST_CONVERTER_BIN="$PWD/app/target/itext-markdown2pdf-TESTING-ONLY-DO-NOT-SHIP"
 
 Never ship that testing executable. The self-test workflow exercises the
 production binary, real GitHub visibility/token checks, action outputs, ZIP
-contents, and readable PDF text on a public GitHub repository. A successful
-local run does not replace this hosted check. Marketplace publishing steps are
+contents, and readable PDF text on a public GitHub repository. The single-file
+test uploads one PDF as `self-test-output`; the separate folder test converts
+`test-fixtures/multi-markdown` and uploads its ZIP as `self-test-folder-output`.
+A successful local run does not replace these hosted checks. Marketplace publishing steps are
 in [`docs/RELEASING.md`](docs/RELEASING.md).
 
 ## License
