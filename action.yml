@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 # See LICENSE in the repository root.
 
-name: 'markdown2pdf'
+name: 'itext-markdown2pdf'
 description: 'Converts a Markdown file to PDF or a folder to a ZIP of PDFs. Linux x86_64, public repositories only.'
 author: 'iText'
 
