@@ -19,6 +19,26 @@ GitHub Action that converts Markdown using iText and produces one output file:
 - The converter is committed to this repo (`bin/itext-markdown2pdf`), so nothing
   is downloaded at runtime.
 
+## Table of contents
+
+- [Usage](#usage)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
+- [Examples](#examples)
+  - [Nested lists](#nested-lists)
+  - [Images and captions](#images-and-captions)
+  - [Screenshots and section headings](#screenshots-and-section-headings)
+  - [Alerts](#alerts)
+  - [Inline code and heading levels](#inline-code-and-heading-levels)
+  - [Banner images and badges](#banner-images-and-badges)
+  - [Code blocks with syntax highlighting](#code-blocks-with-syntax-highlighting)
+  - [Text formatting](#text-formatting)
+- [Permissions](#permissions)
+- [Troubleshooting](#troubleshooting)
+- [Layout](#layout)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Usage
 
 ```yaml
@@ -79,6 +99,100 @@ Generated PDFs use PDF 2.0 and conform to PDF/UA-2. As Markdown already expresse
 lists, tables, links, and alternative text, it is a natural source for the lightweight generation of tagged,
 machine-readable PDFs that meet the latest ISO standard for accessible PDF.
 
+## Examples
+
+See how Markdown documents look before and after conversion. Each example is
+the README of a popular public repository: on the left as GitHub renders it, on
+the right as the PDF/UA-2 file produced by this action. Select a PDF link to
+download the full document and inspect its tags.
+
+Badge values are live, so they may differ slightly between the two screenshots.
+
+### Nested lists
+
+[itext/itext-dotnet](https://github.com/itext/itext-dotnet#readme):
+a centered logo, badges, bold text, and two-level bulleted lists.
+([PDF](docs/examples/itext-dotnet.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![iText .NET README rendered on GitHub: iText logo, badges, introduction and nested feature list](docs/examples/itext-dotnet-markdown.png) | ![The same iText .NET README converted to PDF, with matching logo, badges, introduction and nested feature list](docs/examples/itext-dotnet-pdf.png) |
+
+### Images and captions
+
+[golang/go](https://github.com/golang/go#readme):
+a heading, a full-width illustration, and an italic caption with links.
+([PDF](docs/examples/golang.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![Go README rendered on GitHub: title, Gopher illustration and caption](docs/examples/golang-markdown.png) | ![The same Go README converted to PDF, with matching title, Gopher illustration and caption](docs/examples/golang-pdf.png) |
+
+### Screenshots and section headings
+
+[microsoft/vscode](https://github.com/microsoft/vscode#readme):
+badges, inline code, links, section headings, and a large product screenshot.
+([PDF](docs/examples/vscode.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![VS Code README rendered on GitHub: title, badges, introduction and editor screenshot](docs/examples/vscode-markdown.png) | ![The same VS Code README converted to PDF, with matching title, badges, introduction and editor screenshot](docs/examples/vscode-pdf.png) |
+
+### Alerts
+
+[microsoft/markitdown](https://github.com/microsoft/markitdown#readme):
+a GitHub `[!IMPORTANT]` alert containing inline code, followed by paragraphs
+and a bulleted list.
+([PDF](docs/examples/markitdown.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![MarkItDown README rendered on GitHub: title, badges, Important alert and list of supported formats](docs/examples/markitdown-markdown.png) | ![The same MarkItDown README converted to PDF, with matching title, badges, Important alert and list](docs/examples/markitdown-pdf.png) |
+
+### Inline code and heading levels
+
+[actions/checkout](https://github.com/actions/checkout#readme):
+first- and second-level headings, nested lists, and frequent inline code.
+([PDF](docs/examples/checkout.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![actions/checkout README rendered on GitHub: version headings and change lists with inline code](docs/examples/checkout-markdown.png) | ![The same actions/checkout README converted to PDF, with matching headings and change lists](docs/examples/checkout-pdf.png) |
+
+### Banner images and badges
+
+[freeCodeCamp/freeCodeCamp](https://github.com/freeCodeCamp/freeCodeCamp#readme):
+a full-width banner image, a row of badges, headings, and links.
+([PDF](docs/examples/freecodecamp.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![freeCodeCamp README rendered on GitHub: banner image, badges, heading and introduction](docs/examples/freecodecamp-markdown.png) | ![The same freeCodeCamp README converted to PDF, with matching banner, badges, heading and introduction](docs/examples/freecodecamp-pdf.png) |
+
+### Code blocks with syntax highlighting
+
+[ollama/ollama](https://github.com/ollama/ollama#python) (Python and
+JavaScript sections): fenced code blocks with Python and JavaScript syntax
+highlighting.
+([PDF](docs/examples/ollama.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![Ollama README rendered on GitHub: Python and JavaScript headings, each with an install command and a highlighted code sample](docs/examples/ollama-markdown.png) | ![The same Ollama sections converted to PDF, with matching headings and syntax-highlighted Python and JavaScript code blocks](docs/examples/ollama-pdf.png) |
+
+### Text formatting
+
+[ohmyzsh/ohmyzsh](https://github.com/ohmyzsh/ohmyzsh#readme):
+a centered logo, bold and italic text, inline links, and emoji.
+([PDF](docs/examples/ohmyzsh.pdf))
+
+| Markdown input | PDF output |
+| --- | --- |
+| ![Oh My Zsh README rendered on GitHub: logo and formatted paragraphs](docs/examples/ohmyzsh-markdown.png) | ![The same Oh My Zsh README converted to PDF, with matching logo and formatted paragraphs](docs/examples/ohmyzsh-pdf.png) |
+
+Example content is taken from the linked repositories and remains under their
+licenses.
+
 ## Permissions
 
 The default `GITHUB_TOKEN` is used for the visibility check. If your workflow
@@ -116,6 +230,7 @@ scripts/run-convert.sh      # Runs conversion, packages ZIPs, sets action output
 tests/test_action.py        # Offline wrapper and optional native integration tests
 examples/basic-workflow.yml # Example consumer workflow
 docs/RELEASING.md           # Release/publish steps
+docs/examples/              # Example screenshots and PDFs shown in this README
 ```
 
 ## Contributing
