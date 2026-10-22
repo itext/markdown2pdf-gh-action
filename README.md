@@ -159,3 +159,5 @@ See [NOTICE](NOTICE) for the dependency inventory and license boundaries, and
 including embedded code and fonts. Dependencies retain their own licenses.
 Binary releases, including Artifactory distributions, must include the same
 license and notices; see [Releasing](docs/RELEASING.md).
+
+<img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=68ef1e4b-a8f0-4c2c-bf09-65eca00b22ed&page=README.md" />
